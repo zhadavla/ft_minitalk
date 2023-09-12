@@ -1,6 +1,7 @@
 #include "../ft_minitalk.h"
 
 int current_bit = 0;
+char *text = NULL;
 
 void print_char(void){
 	// printf("current bit = {%d}\n", current_bit);
@@ -27,8 +28,24 @@ static int ft_pow_of_two(int exp){
 		return 128;
 }
 
-void handler(int signum){
+void join_text(char c)
+{
+	char s[2];
+
+	s[0] = c;
+	s[1] = '\0';
+	if (text)
+	{
+		text = ft_strjoin(text, s);
+		// printf("text = {%s}\n", text);
+	}
+	else
+		text = ft_strdup(s);
+}
+
+void handler(int signum, siginfo_t *info, void *context){
 	static int counter = 0;
+	static char current_bit = 0;
 
 	if (signum == SIGUSR1)
 	{	
@@ -38,12 +55,19 @@ void handler(int signum){
 	else if (signum == SIGUSR2)
 		counter++;
 	if (counter == 8){
+		if (current_bit == 0){
+			printf("%s\n", text);
+			free(text);
+			text = NULL;
+			kill(info->si_pid, SIGUSR1);
+			printf("\n");
+		}
 		counter = 0;
-		print_char();
+		join_text(current_bit);
+		// print_char();
 		current_bit = 0;
 	}
 	usleep(5);
-	
 }
 
 
@@ -51,8 +75,9 @@ int main(void){
 	struct sigaction sa_signal;
 	int pid;
 
-	sa_signal.sa_handler = &handler;
-
+	sa_signal.sa_sigaction = handler;
+	sigemptyset(&sa_signal.sa_mask);
+	sa_signal.sa_flags = SA_SIGINFO;
 	sigaction(SIGUSR1, &sa_signal, NULL);
 	sigaction(SIGUSR2, &sa_signal, NULL);
 

@@ -37,6 +37,15 @@ void send_string(int pid, char *str)
 		send_char(pid, str[i]);
 		i++;
 	}
+	if (str[i] == '\0')
+		send_char(pid, '\0');
+
+}
+
+void 	handler_client(int signum)
+{
+	if (signum == SIGUSR1)
+		printf("Message received by the server\n");
 }
 
 int main(int argc, char **argv)
@@ -44,6 +53,8 @@ int main(int argc, char **argv)
 	int pid;
 	int i;
 	int j;
+
+	signal(SIGUSR1, handler_client);
 
 	if (argc != 3)
 	{
