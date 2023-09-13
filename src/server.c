@@ -1,6 +1,18 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   server.c                                           :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: vzhadan <vzhadan@student.42.fr>            +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2023/09/13 16:50:46 by vzhadan           #+#    #+#             */
+/*   Updated: 2023/09/13 17:00:25 by vzhadan          ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "../ft_minitalk.h"
 
-char		*text = NULL;
+char	*g_text = NULL;
 
 static int	ft_pow_of_two(int exp)
 {
@@ -17,23 +29,38 @@ static int	ft_pow_of_two(int exp)
 	return (res);
 }
 
-void	join_text(char c, siginfo_t *info)
+void	join_g_text(char c)
 {
 	char	copy_c[2];
 
 	copy_c[0] = c;
 	copy_c[1] = '\0';
-	if (text)
-		text = ft_strjoin(text, copy_c);
-	else if (!text)
-		text = ft_strdup(copy_c);
+	if (g_text)
+		g_text = ft_strjoin(g_text, copy_c);
+	else if (!g_text)
+		g_text = ft_strdup(copy_c);
 }
 
-void	handler(int signum, siginfo_t *info, void *context)
+void	handle_last_bit(int *counter, char *current_bit, siginfo_t *info)
+{
+	if (*current_bit == 0)
+	{
+		ft_printf("%s\n", g_text);
+		free(g_text);
+		g_text = NULL;
+		kill(info->si_pid, SIGUSR1);
+	}
+	join_g_text(*current_bit);
+	*counter = 0;
+	*current_bit = 0;
+}
+
+void	handler(int signum, siginfo_t *info, void *cong_text)
 {
 	static int	counter;
 	static char	current_bit;
-	
+
+	(void)cong_text;
 	if (signum == SIGUSR1)
 	{
 		current_bit += ft_pow_of_two(counter);
@@ -43,32 +70,21 @@ void	handler(int signum, siginfo_t *info, void *context)
 		counter++;
 	else if (signum == SIGINT)
 	{
-		free(text);
-		text = NULL;
-		printf("You terminated the server!\n");
+		free(g_text);
+		g_text = NULL;
+		ft_printf("You terminated the server!\n");
 		exit(0);
 	}
 	if (counter == 8)
-	{
-		if (current_bit == 0)
-		{
-			printf("%s\n", text);
-			free(text);
-			text = NULL;
-			kill(info->si_pid, SIGUSR1);
-		}
-		join_text(current_bit, info);
-		counter = 0;
-		current_bit = 0;
-	}
+		handle_last_bit(&counter, &current_bit, info);
 	kill(info->si_pid, SIGUSR2);
 	usleep(5);
 }
 
 int	main(void)
 {
-	struct sigaction sa_signal;
-	int				pid;
+	struct sigaction	sa_signal;
+	int					pid;
 
 	sigemptyset(&sa_signal.sa_mask);
 	sa_signal.sa_flags = SA_SIGINFO | SA_RESTART;
@@ -76,9 +92,8 @@ int	main(void)
 	sigaction(SIGUSR1, &sa_signal, NULL);
 	sigaction(SIGUSR2, &sa_signal, NULL);
 	sigaction(SIGINT, &sa_signal, NULL);
-
 	pid = getpid();
-	printf("pid = %d\n", pid);
+	ft_printf("pid = %d\n", pid);
 	while (1)
 		sleep(1);
 	return (0);

@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   client.c                                           :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: vzhadan <vzhadan@student.42.fr>            +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2023/09/13 16:51:18 by vzhadan           #+#    #+#             */
+/*   Updated: 2023/09/13 16:56:20 by vzhadan          ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "../ft_minitalk.h"
 #include <string.h>
 
@@ -43,24 +55,21 @@ void	send_string(int pid, char *str)
 void	handler_client(int signum)
 {
 	if (signum == SIGUSR1)
-		printf("Message received by the server\n");
+		ft_printf("Message received by the server\n");
 }
 
 int	main(int argc, char **argv)
 {
-	int pid;
-	int i;
-	int j;
+	int	pid;
 
 	signal(SIGUSR1, handler_client);
 	signal(SIGUSR2, handler_client);
-
 	if (argc != 3)
 	{
-		printf("Usage: ./client [pid] [string]\n");
+		ft_printf("Usage: ./client [pid] [string]\n");
 		return (1);
 	}
-	pid = atoi(argv[1]);
+	pid = ft_atoi(argv[1]);
 	send_string(pid, argv[2]);
 	return (0);
 }

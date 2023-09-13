@@ -1,7 +1,7 @@
 NAME_CLIENT = client
 NAME_SERVER = server
 
-# FLAGS = -Wall -Wextra -Werror
+FLAGS = -Wall -Wextra -Werror
 LIB_FLAGS = -L./libft -lft
 
 all: client server
