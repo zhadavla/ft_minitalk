@@ -7,10 +7,10 @@
  * representing the 8 bits of the char
  * it iterates through the bits of the char
  * and sends a SIGUSR1 to the process if the bit is 1  else it sends SIGUSR2
-*/
-void send_char(int pid, char c)
+ */
+void	send_char(int pid, char c)
 {
-	int i;
+	int	i;
 
 	i = 0;
 	while (i < 8)
@@ -26,9 +26,9 @@ void send_char(int pid, char c)
 	}
 }
 
-void send_string(int pid, char *str)
+void	send_string(int pid, char *str)
 {
-	int i;
+	int	i;
 
 	i = 0;
 	while (str[i])
@@ -38,17 +38,15 @@ void send_string(int pid, char *str)
 	}
 	if (str[i] == '\0')
 		send_char(pid, '\0');
-
 }
 
-void 	handler_client(int signum)
+void	handler_client(int signum)
 {
 	if (signum == SIGUSR1)
 		printf("Message received by the server\n");
-
 }
 
-int main(int argc, char **argv)
+int	main(int argc, char **argv)
 {
 	int pid;
 	int i;
@@ -60,9 +58,9 @@ int main(int argc, char **argv)
 	if (argc != 3)
 	{
 		printf("Usage: ./client [pid] [string]\n");
-		return 1;
+		return (1);
 	}
 	pid = atoi(argv[1]);
 	send_string(pid, argv[2]);
-	return 0;
+	return (0);
 }

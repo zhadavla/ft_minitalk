@@ -1,24 +1,25 @@
 #include "../ft_minitalk.h"
 
-char *text = NULL;
+char		*text = NULL;
 
-// may be rewriteten as banch of if statements
-static int ft_pow_of_two(int exp){
-	int i;
-	int res;
+static int	ft_pow_of_two(int exp)
+{
+	int	i;
+	int	res;
 
 	i = 0;
 	res = 1;
-	while (i < exp){
+	while (i < exp)
+	{
 		res *= 2;
 		i++;
 	}
 	return (res);
 }
 
-void join_text(char c, siginfo_t *info)
+void	join_text(char c, siginfo_t *info)
 {
-	char copy_c[2];
+	char	copy_c[2];
 
 	copy_c[0] = c;
 	copy_c[1] = '\0';
@@ -28,12 +29,13 @@ void join_text(char c, siginfo_t *info)
 		text = ft_strdup(copy_c);
 }
 
-void handler(int signum, siginfo_t *info, void *context){
-	static int counter = 0;
-	static char current_bit = 0;
-
+void	handler(int signum, siginfo_t *info, void *context)
+{
+	static int	counter;
+	static char	current_bit;
+	
 	if (signum == SIGUSR1)
-	{	
+	{
 		current_bit += ft_pow_of_two(counter);
 		counter++;
 	}
@@ -46,8 +48,10 @@ void handler(int signum, siginfo_t *info, void *context){
 		printf("You terminated the server!\n");
 		exit(0);
 	}
-	if (counter == 8){
-		if (current_bit == 0){
+	if (counter == 8)
+	{
+		if (current_bit == 0)
+		{
 			printf("%s\n", text);
 			free(text);
 			text = NULL;
@@ -61,12 +65,13 @@ void handler(int signum, siginfo_t *info, void *context){
 	usleep(5);
 }
 
-int main(void){
+int	main(void)
+{
 	struct sigaction sa_signal;
-	int pid;
+	int				pid;
 
 	sigemptyset(&sa_signal.sa_mask);
-	sa_signal.sa_flags = SA_SIGINFO;
+	sa_signal.sa_flags = SA_SIGINFO | SA_RESTART;
 	sa_signal.sa_sigaction = handler;
 	sigaction(SIGUSR1, &sa_signal, NULL);
 	sigaction(SIGUSR2, &sa_signal, NULL);
@@ -76,5 +81,5 @@ int main(void){
 	printf("pid = %d\n", pid);
 	while (1)
 		sleep(1);
-	return 0;
+	return (0);
 }
