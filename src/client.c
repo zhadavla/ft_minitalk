@@ -21,8 +21,8 @@ void send_char(int pid, char c)
 			kill(pid, SIGUSR1);
 		else
 			kill(pid, SIGUSR2);
-		c = c >> 1;
 		usleep(500);
+		c = c >> 1;
 		i++;
 	}
 }
@@ -55,6 +55,7 @@ int main(int argc, char **argv)
 	int j;
 
 	signal(SIGUSR1, handler_client);
+	signal(SIGUSR2, handler_client);
 
 	if (argc != 3)
 	{
