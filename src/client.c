@@ -1,7 +1,6 @@
 #include "../ft_minitalk.h"
 #include <string.h>
 
-
 /**
  * Sends a char to a process
  * meaning it sends 8 signals to the process
@@ -21,7 +20,7 @@ void send_char(int pid, char c)
 			kill(pid, SIGUSR1);
 		else
 			kill(pid, SIGUSR2);
-		usleep(500);
+		usleep(424242);
 		c = c >> 1;
 		i++;
 	}
@@ -46,6 +45,7 @@ void 	handler_client(int signum)
 {
 	if (signum == SIGUSR1)
 		printf("Message received by the server\n");
+
 }
 
 int main(int argc, char **argv)

@@ -1,31 +1,19 @@
 #include "../ft_minitalk.h"
 
-// int current_bit = 0;
 char *text = NULL;
-
-// void print_char(void){
-// 	// printf("current bit = {%d}\n", current_bit);
-// 	write(1, &current_bit, 1);
-// }
 
 // may be rewriteten as banch of if statements
 static int ft_pow_of_two(int exp){
-	if (exp == 0)
-		return 1;
-	if (exp == 1)
-		return 2;
-	if (exp == 2)
-		return 4;
-	if (exp == 3)
-		return 8;
-	if (exp == 4)	
-		return 16;
-	if (exp == 5)	
-		return 32;
-	if (exp == 6)
-		return 64;
-	if (exp == 7)
-		return 128;
+	int i;
+	int res;
+
+	i = 0;
+	res = 1;
+	while (i < exp){
+		res *= 2;
+		i++;
+	}
+	return (res);
 }
 
 void join_text(char c, siginfo_t *info)
@@ -37,11 +25,7 @@ void join_text(char c, siginfo_t *info)
 	if (text)
 		text = ft_strjoin(text, copy_c);
 	else if (!text)
-	{
-		// printf("text = {%s}\n", text);
 		text = ft_strdup(copy_c);
-	}
-	kill(info->si_pid, SIGUSR2);
 }
 
 void handler(int signum, siginfo_t *info, void *context){
@@ -59,7 +43,7 @@ void handler(int signum, siginfo_t *info, void *context){
 	{
 		free(text);
 		text = NULL;
-		printf("Error another signal\n");
+		printf("You terminated the server!\n");
 		exit(0);
 	}
 	if (counter == 8){
@@ -73,26 +57,9 @@ void handler(int signum, siginfo_t *info, void *context){
 		counter = 0;
 		current_bit = 0;
 	}
+	kill(info->si_pid, SIGUSR2);
 	usleep(5);
 }
-
-
-// int main(void){
-// 	struct sigaction sa_signal;
-// 	int pid;
-
-// 	sa_signal.sa_sigaction = handler;
-// 	sigemptyset(&sa_signal.sa_mask);
-// 	sa_signal.sa_flags = SA_SIGINFO;
-// 	sigaction(SIGUSR1, &sa_signal, NULL);
-// 	sigaction(SIGUSR2, &sa_signal, NULL);
-
-// 	pid = getpid();
-// 	printf("pid = %d\n", pid);
-// 	while (1)
-// 		sleep(1);
-// 	return 0;
-// }
 
 int main(void){
 	struct sigaction sa_signal;
@@ -108,6 +75,6 @@ int main(void){
 	pid = getpid();
 	printf("pid = %d\n", pid);
 	while (1)
-		pause();
+		sleep(1);
 	return 0;
 }
